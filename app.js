@@ -46,7 +46,6 @@ app.post('/login', (req, res) => {
   }
 });
 
-
 app.get('/admin', (req, res) => {
   sess = req.session;
   if (sess.admin) {
