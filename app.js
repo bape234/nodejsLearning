@@ -10,16 +10,21 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
 // Imagine this was the db with the names and pw hased and not just an array of strings:)
-var registered = ["peter", "igor"];
+var registered = new Array();
 var adminPath = path.join(__dirname, 'admin');
 var sess;
 var body;
 
+// username
+function User(username, password) {
+  this.username = username;
+  this.password = password;
+}
 
 app.post('/register', (req, res) => {
     sess = req.session;
     body = req.body;
-    registered.push(body.username);
+    registered.push(new User(body.username, body.password));
     console.log("registered persons are: " + registered)
     res.redirect('/index.html');
 });
@@ -33,16 +38,17 @@ app.post('/login', (req, res) => {
   }
   else {
     console.log(body.username);
-
-    if (registered.indexOf(body.username) != -1){
-      // User is registetered
-      // You wouldnt just check the username to validate that he gets the cookie
-        console.log('You are not logged in as admin, wait a second.');
-        sess.admin = true;
-        res.redirect('/admin');
-    } else {
-      res.redirect('login.html');
+    for (var i = 0; i < registered.length; i++) {
+      if (registered[i].username == body.username && registered[i].password == body.password) {
+                console.log('Succesfully logged in');
+                sess.admin = true;
+                res.redirect('/admin');
+                return;
+      }
     }
+
+    console.log('failed to log in, wrong credentials')
+    res.redirect('login.html');
   }
 });
 
